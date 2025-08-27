@@ -29,6 +29,12 @@ class WooEngraving {
 
         // 6. Show in admin order
         add_action( 'woocommerce_after_order_itemmeta', [ $this, 'display_engraving_in_admin' ], 10, 3 );
+
+        // Add engraving cost
+        add_action( 'woocommerce_cart_calculate_fees', [ $this, 'add_engraving_fee' ] );
+
+        // Register settings
+        add_filter( 'woocommerce_get_settings_products', [ $this, 'add_settings' ], 10, 2 );
     }
 
     // 1. Product page input
@@ -80,6 +86,58 @@ class WooEngraving {
         if ( $engraving ) {
             echo '<p><strong>Engraving:</strong> ' . esc_html( $engraving ) . '</p>';
         }
+    }
+
+    // 7. Add engraving fee per item
+    public function add_engraving_fee( $cart ) {
+        if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+            return;
+        }
+
+        $engraving_fee_per_item = get_option( 'engraving_fee_amount', 10000 ); // default Rp10,000
+        $engraving_fee = 0;
+
+        foreach ( $cart->get_cart() as $cart_item ) {
+            if ( isset( $cart_item['engraving_text'] ) && ! empty( $cart_item['engraving_text'] ) ) {
+                $engraving_fee += $engraving_fee_per_item * $cart_item['quantity'];
+            }
+        }
+
+        if ( $engraving_fee > 0 ) {
+            $cart->add_fee( __( 'Engraving Fee', 'woo-engraving' ), $engraving_fee );
+        }
+    }
+
+    // 8. Add engraving fee setting
+    public function add_settings( $settings, $current_section ) {
+        if ( $current_section === '' ) { // General section
+            $custom_settings = array();
+
+            $custom_settings[] = array(
+                'name' => __( 'Engraving Fee', 'woo-engraving' ),
+                'type' => 'title',
+                'desc' => __( 'Settings for engraving customization.', 'woo-engraving' ),
+                'id'   => 'engraving_options',
+            );
+
+            $custom_settings[] = array(
+                'name'     => __( 'Engraving Fee Amount', 'woo-engraving' ),
+                'id'       => 'engraving_fee_amount',
+                'type'     => 'number',
+                'desc'     => __( 'Fee per item when engraving is added (in Rp).', 'woo-engraving' ),
+                'default'  => '10000',
+                'desc_tip' => true,
+            );
+
+            $custom_settings[] = array(
+                'type' => 'sectionend',
+                'id'   => 'engraving_options',
+            );
+
+            return array_merge( $settings, $custom_settings );
+        }
+
+        return $settings;
     }
 }
 
