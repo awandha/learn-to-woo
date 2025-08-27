@@ -1,0 +1,38 @@
+.engraving-wrapper {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.engraving-wrapper label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.engraving-field input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.engraving-counter {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.engraving-preview {
+    margin-top: 10px;
+    font-size: 14px;
+    font-style: italic;
+    color: #333;
+}
+
+.engraving-preview strong {
+    color: #000;
+}

@@ -13,7 +13,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WooEngraving {
     public function __construct() {
         // 1. Add field on product page
-        add_action( 'woocommerce_before_add_to_cart_button', [ $this, 'add_engraving_field' ] );
+        // add_action( 'woocommerce_before_add_to_cart_button', [ $this, 'add_engraving_field' ] );
+
+        add_action('woocommerce_before_add_to_cart_button', function() {
+            echo '<div class="engraving-wrapper">';
+            woocommerce_form_field('engraving_text', [
+                'type'        => 'text',
+                'class'       => ['engraving-field form-row-wide'],
+                'label'       => 'Engraving text',
+                'placeholder' => 'Enter text to engrave',
+                'maxlength'   => 30, // limit characters
+            ]);
+            echo '<p class="engraving-counter">0/30 characters</p>';
+            echo '<p class="engraving-preview"><strong>Preview:</strong> <span id="engraving-preview-text">-</span></p>';
+            echo '</div>';
+        });
+
+        add_action('wp_enqueue_scripts', function() {
+            if (is_product()) {
+                wp_enqueue_script(
+                    'engraving-enhancements',
+                    plugin_dir_url(__FILE__) . 'engraving-enhancements.js',
+                    ['jquery'],
+                    time(),
+                    true
+                );
+            }
+        });
+
+        add_action('wp_enqueue_scripts', function() {
+            if (is_product()) {
+                wp_enqueue_style(
+                    'engraving-enhancements-css',
+                    plugin_dir_url(__FILE__) . 'engraving-enhancements.css',
+                    [],
+                    time()
+                );
+            }
+        });
 
         // 2. Validate
         add_filter( 'woocommerce_add_to_cart_validation', [ $this, 'validate_engraving_field' ], 10, 2 );
