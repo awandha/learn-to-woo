@@ -6,8 +6,28 @@ jQuery(document).ready(function($) {
 
     function updateUI() {
         const val = $field.val();
-        $counter.text(val.length + '/' + maxLength + ' characters');
-        $preview.text(val.length ? val : '-');
+        const length = val.length;
+
+        // Update counter
+        $counter.text(length + '/' + maxLength + ' characters');
+
+        // Toggle warning styles + animation
+        if (length >= maxLength) {
+            $counter.css('color', 'red');
+            $field.css('border-color', 'red');
+
+            // Add shake effect when user tries to type more
+            if (length === maxLength) {
+                $field.addClass('shake');
+                setTimeout(() => $field.removeClass('shake'), 300);
+            }
+        } else {
+            $counter.css('color', '#666'); // normal gray
+            $field.css('border-color', '');
+        }
+
+        // Update preview
+        $preview.text(length ? val : '-');
     }
 
     $field.on('input', updateUI);
